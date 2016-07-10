@@ -1,8 +1,8 @@
 # Introduction
 
-THis repository contains code for the papaer **[Lucas-Kanade 20 Years On: A Unifying Framework][1]**.
+This repository contains code for the papaer **[Lucas-Kanade 20 Years On: A Unifying Framework][1]**.
 
-In folder papers, you can find the following papaers:
+In the folder papers, you can find the following papers:
 
  - Lucas-Kanade 20 Years On: A Unifying Framework: Part 1
  - Lucas-Kanade 20 Years On: A Unifying Framework: Part 2
