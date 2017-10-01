@@ -1,0 +1,123 @@
+IMSCRIPT
+========
+
+Imscript is a language to express simple image processing operations.
+The goal is that safe online implementations of the language are
+trivially easy to deploy.  Each of the simple image processing
+operations is available as a separate, standalone program.
+
+
+LANGUAGE OVERVIEW
+-----------------
+
+Imscript is a stack-based language: it describes the evolution of a
+stack of images.  A program is a sequence of instructions.  Each
+instruction consists of an instruction name and a fixed number of
+parameters.  A typical instruction pops one image from the top of the
+stack, processes this image, and pushes the result at the top of the
+stack.
+
+As an example, the following program loads an image from an URL,
+equalizes its histogram, and saves the result to a file:
+
+	load http://path/to/lena.png
+	histeq
+	save /path/to/eqlena.png
+
+As a more complicated example, the following program performs a
+half-pixel displacement via Fourier interpolation:
+
+	load http://path/to/lena.png
+	fft
+	lambda "exp(-i*PI*(real(x)+imag(x)))"
+	mul
+	ifft
+	save /pat/to/traslena.png
+
+
+LIST OF INSTRUCTIONS
+--------------------
+
+The following instructions should be more or less obvious, but it
+would be nice to document each one separately.  Each instruction
+takes a fixed number of images from the stack and pushes back a fixed
+number of results.  These numbers are different for each instruction.
+For example, the "sum" function computes the sum of the two images at
+the top of the stack, and puts the result at the top.  The arguments
+to the instructions are never deleted.
+
+
+input/output:
+
+	load FILENAME
+	load URL
+	save FILENAME
+
+
+stack manipulation:
+
+	dup
+	rot
+	del
+	swap IDX
+	copy IDX
+
+
+image operations:
+
+	axpb A B
+	normalize BLACK WHITE
+	crop X0 Y0 XF YF
+	resample W H
+	lambda EXPRESSION
+	gnoise SIGMA
+	gblur SIGMA
+	fft
+	ifft
+	histeq
+	histmatch
+	tr X Y
+	aff A B P C D Q
+	hom H1 ... H9
+	randtr SIGMA MU
+	sum
+	mul
+	quantize
+	linconv3x3 K1 ... K9
+	linconv4x4 K1 ... K16
+	erosion R
+	dilation R
+
+
+programming:
+	def NAME STRING
+
+
+
+
+SYNTAX OF THE LAMBDA FUNCTION
+-----------------------------
+
+The call
+
+	lambda "expression"
+
+pops n images from the stack, where n is the number of variables on
+the expression.  Each variable corresponds to an image (in
+alphabetical order) and the expression is evaluated pixel-wise to
+produce a single output image.  The variables admit two kind of
+modificators, to access a neighboring pixel, and to access a
+particular component of a pixel.  There are further variables ":w,
+:h, :n, :i, :j, :x, :y, :r, :t" contaning the width, height, number
+of pixels, and the coordinates of the current pixel in various
+coordinate systems.
+
+Examples:
+
+	lambda "a*x + b" == faxpb
+	lambda "x(1,0) - x" == forward differences in horizontal direction
+	lambda "x - x(-1,0)" == backward differences in horizontal direction
+	lambda "0.3*x[0] + 0.6*x[1] + 0.1*x[2]" == color to gray
+
+
+# vim:set tw=69 filetype=text:
